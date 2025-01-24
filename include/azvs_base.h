@@ -86,14 +86,19 @@ A_Logger *a_initLogger();
 // 简化日志输出
 
 #ifdef DISABLE_LOGGER
-    #define A_LOG_MSG(level, format, ...) do {} while(0)
+#define A_LOG_MSG(level, format, ...) \
+    do                                \
+    {                                 \
+    } while (0)
 #else
-    #define A_LOG_MSG(level, format, ...) \
-        do { \
-            if (a_logger_singleton != NULL) { \
-                a_logger_singleton->loggerMessage(level, __FUNCTION__, __LINE__, format, ##__VA_ARGS__); \
-            } \
-        } while (0)
+#define A_LOG_MSG(level, format, ...)                                                                \
+    do                                                                                               \
+    {                                                                                                \
+        if (a_logger_singleton != NULL)                                                              \
+        {                                                                                            \
+            a_logger_singleton->loggerMessage(level, __FUNCTION__, __LINE__, format, ##__VA_ARGS__); \
+        }                                                                                            \
+    } while (0)
 #endif // DISABLE_LOGGER
 #define A_LOG_MSG_TRACE(format, ...) A_LOG_MSG(A_TRACE, format, ##__VA_ARGS__)
 #define A_LOG_MSG_DEBUG(format, ...) A_LOG_MSG(A_DEBUG, format, ##__VA_ARGS__)
@@ -140,10 +145,30 @@ void delete_with_log(void *ptr, const char *function, int line);
 
 #define NEW_TYPE(type) ((type *)new_with_log(sizeof(type), __FUNCTION__, __LINE__))
 #define NEW_SIZE(size) new_with_log(size, __FUNCTION__, __LINE__)
-#define NEW_ARRAY(type, count) ((type *)new_with_log(sizeof(type)*(count), __FUNCTION__, __LINE__))
+#define NEW_ARRAY(type, count) ((type *)new_with_log(sizeof(type) * (count), __FUNCTION__, __LINE__))
 #define RENEW_TYPE(ptr, type) ((type *)renew_with_log(ptr, sizeof(type), __FUNCTION__, __LINE__))
 #define RENEW_SIZE(ptr, size) renew_with_log(ptr, size, __FUNCTION__, __LINE__)
-#define RENEW_ARRAY(ptr, type, count) ((type *)renew_with_log(ptr, sizeof(type)*(count), __FUNCTION__, __LINE__))
+#define RENEW_ARRAY(ptr, type, count) ((type *)renew_with_log(ptr, sizeof(type) * (count), __FUNCTION__, __LINE__))
 #define DELETE(ptr) delete_with_log(ptr, __FUNCTION__, __LINE__)
+
+//////////////////////////////////////////////////
+//     卫语句 (Guard Statement)
+//////////////////////////////////////////////////
+
+#define GUARD_CHECK(level, judgment, result, format, ...) \
+    do                                                    \
+    {                                                     \
+        if (judgment)                                     \
+        {                                                 \
+            A_LOG_MSG(level, format, ##__VA_ARGS__);      \
+            result;                                       \
+        }                                                 \
+    } while (0)
+#define GUARD_CHECK_TRACE(judgment, result, format, ...) GUARD_CHECK(A_TRACE, judgment, result, format, ##__VA_ARGS__)
+#define GUARD_CHECK_DEBUG(judgment, result, format, ...) GUARD_CHECK(A_DEBUG, judgment, result, format, ##__VA_ARGS__)
+#define GUARD_CHECK_INFO(judgment, result, format, ...) GUARD_CHECK(A_INFO, judgment, result, format, ##__VA_ARGS__)
+#define GUARD_CHECK_WARN(judgment, result, format, ...) GUARD_CHECK(A_WARN, judgment, result, format, ##__VA_ARGS__)
+#define GUARD_CHECK_ERROR(judgment, result, format, ...) GUARD_CHECK(A_ERROR, judgment, result, format, ##__VA_ARGS__)
+#define GUARD_CHECK_FATAL(judgment, result, format, ...) GUARD_CHECK(A_FATAL, judgment, result, format, ##__VA_ARGS__)
 
 #endif // !AZVS_BASE_H
