@@ -102,4 +102,48 @@ A_Logger *a_initLogger();
 #define A_LOG_MSG_ERROR(format, ...) A_LOG_MSG(A_ERROR, format, ##__VA_ARGS__)
 #define A_LOG_MSG_FATAL(format, ...) A_LOG_MSG(A_FATAL, format, ##__VA_ARGS__)
 
+//////////////////////////////////////////////////
+//     内存的申请与释放
+//////////////////////////////////////////////////
+
+// 在C标准库中内存操作相关函数：
+//      + void *malloc(size_t size);
+//      + void *calloc(size_t num, size_t size);
+//      + void *realloc(void *ptr, size_t new_size);
+//      + void free(void *ptr);
+// 为方便后续观察内存调用情况，将其封装。
+
+/**
+ * @brief 用于申请内存
+ * @param size 内存大小
+ * @param function 函数名，为日志服务
+ * @param line 行号，为日志服务
+ */
+void *new_with_log(size_t size, const char *function, int line);
+
+/**
+ * @brief 用于重新申请内存
+ * @param ptr 内存指针
+ * @param size 新申请的内存大小
+ * @param function 函数名，为日志服务
+ * @param line 行号，为日志服务
+ */
+void *renew_with_log(void *ptr, size_t size, const char *function, int line);
+
+/**
+ * @brief 用于释放内存
+ * @param ptr 内存指针
+ * @param function 函数名，为日志服务
+ * @param line 行号，为日志服务
+ */
+void delete_with_log(void *ptr, const char *function, int line);
+
+#define NEW_TYPE(type) ((type *)new_with_log(sizeof(type), __FUNCTION__, __LINE__))
+#define NEW_SIZE(size) new_with_log(size, __FUNCTION__, __LINE__)
+#define NEW_ARRAY(type, count) ((type *)new_with_log(sizeof(type)*(count), __FUNCTION__, __LINE__))
+#define RENEW_TYPE(ptr, type) ((type *)renew_with_log(ptr, sizeof(type), __FUNCTION__, __LINE__))
+#define RENEW_SIZE(ptr, size) renew_with_log(ptr, size, __FUNCTION__, __LINE__)
+#define RENEW_ARRAY(ptr, type, count) ((type *)renew_with_log(ptr, sizeof(type)*(count), __FUNCTION__, __LINE__))
+#define DELETE(ptr) delete_with_log(ptr, __FUNCTION__, __LINE__)
+
 #endif // !AZVS_BASE_H
