@@ -28,10 +28,10 @@ A_Logger *a_initLogger()
             return NULL;
         }
 
-        a_logger_singleton->currentLoggerLevel = A_INFO | A_WARN | A_ERROR;
-        a_logger_singleton->currentLoggerOutputType = A_CONSOLE;
-        a_logger_singleton->filePath = strdup("./logs/default.log");
-        a_logger_singleton->outputFile = NULL;
+        a_logger_singleton->__currentLoggerLevel = A_INFO | A_WARN | A_ERROR;
+        a_logger_singleton->__currentLoggerOutputType = A_CONSOLE;
+        a_logger_singleton->__filePath = strdup("./logs/default.log");
+        a_logger_singleton->__outputFile = NULL;
 
         a_logger_singleton->setLoggerLevel = __setLoggerLevel;
         a_logger_singleton->setLoggerOutputType = __setLoggerOutputType;
@@ -44,7 +44,7 @@ A_Logger *a_initLogger()
 
 void __setLoggerLevel(const int level)
 {
-    a_logger_singleton->currentLoggerLevel = level;
+    a_logger_singleton->__currentLoggerLevel = level;
 }
 
 void __setLoggerOutputType(const int type)
@@ -59,25 +59,25 @@ void __setLoggerOutputType(const int type)
             exit(1)
     */
 
-    if ((a_logger_singleton->currentLoggerOutputType & A_FILE) != 0 && (type & A_FILE) == 0)
+    if ((a_logger_singleton->__currentLoggerOutputType & A_FILE) != 0 && (type & A_FILE) == 0)
     {
-        if (fclose(a_logger_singleton->outputFile) != 0)
+        if (fclose(a_logger_singleton->__outputFile) != 0)
         {
-            A_LOG_MSG_ERROR("日志文件 %s 关闭失败!\n", a_logger_singleton->filePath);
+            A_LOG_MSG_ERROR("日志文件 %s 关闭失败!\n", a_logger_singleton->__filePath);
         }
         else
         {
-            a_logger_singleton->outputFile = NULL;
+            a_logger_singleton->__outputFile = NULL;
         }
     }
-    if ((a_logger_singleton->currentLoggerOutputType & A_FILE) == 0 && (type & A_FILE) != 0)
+    if ((a_logger_singleton->__currentLoggerOutputType & A_FILE) == 0 && (type & A_FILE) != 0)
     {
-        if (a_logger_singleton->filePath != NULL)
+        if (a_logger_singleton->__filePath != NULL)
         {
-            a_logger_singleton->outputFile = fopen(a_logger_singleton->filePath, "a+");
-            if (a_logger_singleton->outputFile == NULL)
+            a_logger_singleton->__outputFile = fopen(a_logger_singleton->__filePath, "a+");
+            if (a_logger_singleton->__outputFile == NULL)
             {
-                A_LOG_MSG_FATAL("日志文件 %s 打开失败！请确保路径存在！\n", a_logger_singleton->filePath);
+                A_LOG_MSG_FATAL("日志文件 %s 打开失败！请确保路径存在！\n", a_logger_singleton->__filePath);
                 exit(1);
             }
         }
@@ -87,7 +87,7 @@ void __setLoggerOutputType(const int type)
             exit(1);
         }
     }
-    a_logger_singleton->currentLoggerOutputType = type;
+    a_logger_singleton->__currentLoggerOutputType = type;
 }
 
 void __setFilePath(const char *path)
@@ -101,27 +101,27 @@ void __setFilePath(const char *path)
         打开新的日志文件
     */
 
-    if ((a_logger_singleton->currentLoggerOutputType & A_FILE) == 0)
+    if ((a_logger_singleton->__currentLoggerOutputType & A_FILE) == 0)
     {
-        free(a_logger_singleton->filePath);
-        a_logger_singleton->filePath = strdup(path);
+        free(a_logger_singleton->__filePath);
+        a_logger_singleton->__filePath = strdup(path);
     }
-    if ((a_logger_singleton->currentLoggerOutputType & A_FILE) != 0)
+    if ((a_logger_singleton->__currentLoggerOutputType & A_FILE) != 0)
     {
-        if (fclose(a_logger_singleton->outputFile) != 0)
+        if (fclose(a_logger_singleton->__outputFile) != 0)
         {
-            A_LOG_MSG_ERROR("日志文件 %s 关闭失败！\n", a_logger_singleton->filePath);
+            A_LOG_MSG_ERROR("日志文件 %s 关闭失败！\n", a_logger_singleton->__filePath);
         }
         else
         {
-            a_logger_singleton->outputFile = NULL;
+            a_logger_singleton->__outputFile = NULL;
         }
-        free(a_logger_singleton->filePath);
-        a_logger_singleton->filePath = strdup(path);
-        a_logger_singleton->outputFile = fopen(a_logger_singleton->filePath, "a+");
-        if (a_logger_singleton->outputFile == NULL)
+        free(a_logger_singleton->__filePath);
+        a_logger_singleton->__filePath = strdup(path);
+        a_logger_singleton->__outputFile = fopen(a_logger_singleton->__filePath, "a+");
+        if (a_logger_singleton->__outputFile == NULL)
         {
-            A_LOG_MSG_FATAL("日志文件 %s 打开失败！请确保路径存在！\n", a_logger_singleton->filePath);
+            A_LOG_MSG_FATAL("日志文件 %s 打开失败！请确保路径存在！\n", a_logger_singleton->__filePath);
             exit(1);
         }
     }
@@ -129,7 +129,7 @@ void __setFilePath(const char *path)
 
 void __loggerMessage(const A_LoggerLevel level, const char *function, const int line, const char *format, ...)
 {
-    if (0 == (level & a_logger_singleton->currentLoggerLevel))
+    if (0 == (level & a_logger_singleton->__currentLoggerLevel))
     {
         return;
     }
@@ -146,7 +146,7 @@ void __loggerMessage(const A_LoggerLevel level, const char *function, const int 
     timeinfo = localtime(&nowtime);
 
     // 控制台输出逻辑
-    if (A_CONSOLE & a_logger_singleton->currentLoggerOutputType)
+    if (A_CONSOLE & a_logger_singleton->__currentLoggerOutputType)
     {
         printf("[%04d-%02d-%02d %02d:%02d:%02d][%s][%s:%d] -> %s",
                timeinfo->tm_year + 1900,
@@ -159,9 +159,9 @@ void __loggerMessage(const A_LoggerLevel level, const char *function, const int 
                function, line, buffer);
     }
     // 文件输出逻辑
-    if (A_FILE & a_logger_singleton->currentLoggerOutputType)
+    if (A_FILE & a_logger_singleton->__currentLoggerOutputType)
     {
-        fprintf(a_logger_singleton->outputFile,
+        fprintf(a_logger_singleton->__outputFile,
                 "[%04d-%02d-%02d %02d:%02d:%02d][%s][%s:%d] -> %s",
                 timeinfo->tm_year + 1900,
                 timeinfo->tm_mon + 1,
@@ -171,24 +171,24 @@ void __loggerMessage(const A_LoggerLevel level, const char *function, const int 
                 timeinfo->tm_sec,
                 getLoggerLevelString(level),
                 function, line, buffer);
-        fflush(a_logger_singleton->outputFile); // 确保内容写入文件
+        fflush(a_logger_singleton->__outputFile); // 确保内容写入文件
     }
 }
 
 void __destroy()
 {
-    if (a_logger_singleton->outputFile)
+    if (a_logger_singleton->__outputFile)
     {
-        if (fclose(a_logger_singleton->outputFile) != 0)
+        if (fclose(a_logger_singleton->__outputFile) != 0)
         {
-            A_LOG_MSG_ERROR("日志文件 %s 关闭失败！\n", a_logger_singleton->filePath);
+            A_LOG_MSG_ERROR("日志文件 %s 关闭失败！\n", a_logger_singleton->__filePath);
         }
         else
         {
-            a_logger_singleton->outputFile = NULL;
+            a_logger_singleton->__outputFile = NULL;
         }
-        free(a_logger_singleton->filePath);
-        a_logger_singleton->filePath = NULL;
+        free(a_logger_singleton->__filePath);
+        a_logger_singleton->__filePath = NULL;
     }
     free(a_logger_singleton);
     a_logger_singleton = NULL;

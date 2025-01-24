@@ -52,13 +52,13 @@ typedef enum logger_output_type
 typedef struct azvs_logger
 {
     // 当前日志输出级别
-    A_LoggerLevel currentLoggerLevel;
+    A_LoggerLevel __currentLoggerLevel;
     // 当前日志输出方式
-    A_LoggerOutputType currentLoggerOutputType;
+    A_LoggerOutputType __currentLoggerOutputType;
     // 日志文件指针
-    FILE *outputFile;
+    FILE *__outputFile;
     // 日志文件路径
-    char *filePath;
+    char *__filePath;
 
     // 修改当前日志输出级别
     void (*setLoggerLevel)(const int level);
