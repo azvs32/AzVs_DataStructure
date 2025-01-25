@@ -85,12 +85,7 @@ A_Logger *a_initLogger();
 
 // 简化日志输出
 
-#ifdef DISABLE_LOGGER
-#define A_LOG_MSG(level, format, ...) \
-    do                                \
-    {                                 \
-    } while (0)
-#else
+#ifdef ENABLE_LOGGER
 #define A_LOG_MSG(level, format, ...)                                                                \
     do                                                                                               \
     {                                                                                                \
@@ -98,6 +93,11 @@ A_Logger *a_initLogger();
         {                                                                                            \
             a_logger_singleton->loggerMessage(level, __FUNCTION__, __LINE__, format, ##__VA_ARGS__); \
         }                                                                                            \
+    } while (0)
+#else
+#define A_LOG_MSG(level, format, ...) \
+    do                                \
+    {                                 \
     } while (0)
 #endif // DISABLE_LOGGER
 #define A_LOG_MSG_TRACE(format, ...) A_LOG_MSG(A_TRACE, format, ##__VA_ARGS__)
