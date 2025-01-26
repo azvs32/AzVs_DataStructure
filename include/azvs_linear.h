@@ -12,11 +12,42 @@ typedef struct azvs_linear
     size_t count;             // 线性表实际数据数量
     size_t total;             // 线性表最大存储容量
 
-    // 销毁线性表
-    void (*destroy)();
+    /**
+     * @brief 释放线性表
+     * @param self 线性表本身
+     */
+    void (*destroy)(struct azvs_linear * self);
+
+    /**
+     * @brief 在下标index位置存入data数据
+     * @param self 线性表本身
+     * @param data 需要插入的数据
+     * @param index 指定的下标
+     */
+    void (*set)(const struct azvs_linear * self, const void *data, const size_t index);
+
+    /**
+     * @brief 返回指定下标元素的数据
+     * @param self 线性表本身
+     * @param index 指定的下标
+     */
+    void*(*get)(const struct azvs_linear * self, const size_t index);
+
+    /**
+     * @brief 删除指定下标元素的数据
+     * @param self 线性表本身
+     * @param index 指定的下标
+     */
+    void (*del)(const struct azvs_linear * self, const size_t index);
+
 } A_Linear, *AP_Linear;
 
-// 初始化线性表对象
+/**
+ * @brief 初始化线性表
+ * @param total 线性表存储元素的最大数量
+ * @param data_size 每个元素占用的大小
+ * @param data_type 线性表中元素的类型
+ */
 AP_Linear __a_initLinear(const size_t total, const size_t data_size, char *data_type);
 #define a_initLinear(total, data_type) __a_initLinear(total, sizeof(data_type), #data_type)
 
