@@ -14,14 +14,14 @@ void __destroy();
 char *getLoggerLevelString(const A_LoggerLevel level);
 
 // 全局单例的日志对象
-A_Logger *a_logger_singleton;
+AP_Logger a_logger_singleton;
 
 // 初始化日志对象
-A_Logger *a_initLogger()
+AP_Logger a_initLogger()
 {
     if (NULL == a_logger_singleton)
     {
-        a_logger_singleton = (A_Logger *)malloc(sizeof(A_Logger));
+        a_logger_singleton = (AP_Logger)malloc(sizeof(A_Logger));
         if (!a_logger_singleton)
         {
             fprintf(stderr, "init -> 初始化日志对象时内存分配失败！\n");

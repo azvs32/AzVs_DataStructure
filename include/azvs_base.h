@@ -68,22 +68,16 @@ typedef struct azvs_logger
     void (*setFilePath)(const char *path);
     // 输出日志信息，并设置当前日志行的级别
     void (*loggerMessage)(const A_LoggerLevel level, const char *function, const int line, const char *format, ...);
-
-    // 初始化日志结构体
-    // （需要给函数指针赋值，只能放在结构体外部）
-    // void (*init)();
     // 销毁日志结构体
     void (*destroy)();
 
-} A_Logger;
+} A_Logger, *AP_Logger;
 
 // 全局单例的日志对象
-extern A_Logger *a_logger_singleton;
+extern AP_Logger a_logger_singleton;
 
 // 初始化单例日志对象
-A_Logger *a_initLogger();
-
-// 简化日志输出
+AP_Logger a_initLogger();
 
 #ifdef ENABLE_LOGGER
 #define A_LOG_MSG(level, format, ...)                                                                \
